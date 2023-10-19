@@ -1,0 +1,55 @@
+{
+    "name": "kemetech/fortifyplus",
+    "description": "Dual guard features added to laravel fortify authentication package.",
+    "keywords": ["laravel", "fortify plus"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/laravel/fortify/issues",
+        "source": "https://github.com/laravel/fortify"
+    },
+    "authors": [
+        {
+            "name": "Moataz Elsayed",
+            "email": "dr.moatazelsayed@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "ext-json": "*",
+        "bacon/bacon-qr-code": "^2.0",
+        "illuminate/support": "^8.82|^9.0|^10.0",
+        "pragmarx/google2fa": "^7.0|^8.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.0",
+        "orchestra/testbench": "^6.0|^7.0|^8.0",
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^9.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "FortifyPlus\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Models\\": "tests/Fixtures/Models",
+            "FortifyPlus\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "FortifyPlus\\FortifyServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
