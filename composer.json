@@ -4,8 +4,7 @@
     "keywords": ["laravel", "fortify plus"],
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/laravel/fortify/issues",
-        "source": "https://github.com/laravel/fortify"
+        "source": "https://github.com/kemetech/fortifyplus"
     },
     "authors": [
         {
