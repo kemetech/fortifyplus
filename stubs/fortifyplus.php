@@ -54,10 +54,7 @@ return [
 
     'username' => 'email',
 
-    'email' => [
-        'user'  => 'email',
-        'admin' => 'email'
-    ],
+    'email' => 'email',
 
     /*
     |--------------------------------------------------------------------------
@@ -85,7 +82,7 @@ return [
 
     'home' => [
         'user'  => RouteServiceProvider::HOME,
-        'admin' => '/admin'
+        'admin' => '/admin/dashboard'
     ],
 
     /*
@@ -99,7 +96,10 @@ return [
     |
     */
 
-    'prefix' => '',
+    'prefix' => [
+        'user' => '',
+        'admin' => ''
+    ],
 
     'domain' => null,
 

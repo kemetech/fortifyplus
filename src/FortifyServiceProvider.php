@@ -34,6 +34,10 @@ use FortifyPlus\Http\Controllers\Admin\RegisterAdminController;
 use FortifyPlus\Http\Controllers\Admin\AdminSessionAuthentication;
 use FortifyPlus\Http\Controllers\Admin\AdminTwoFactorAuthenticatedSessionController;
 use FortifyPlus\Http\Controllers\Admin\AdminVerifyEmailController;
+use FortifyPlus\Http\Controllers\AuthenticatedSessionController;
+use FortifyPlus\Http\Controllers\RegisteredUserController;
+use FortifyPlus\Http\Controllers\TwoFactorAuthenticatedSessionController;
+use FortifyPlus\Http\Controllers\VerifyEmailController;
 use FortifyPlus\Http\Middleware\RedirectAuthenticatedAdmin;
 use FortifyPlus\Http\Responses\EmailVerificationNotificationSentResponse;
 use FortifyPlus\Http\Responses\FailedPasswordConfirmationResponse;
@@ -55,6 +59,7 @@ use FortifyPlus\Http\Responses\TwoFactorDisabledResponse;
 use FortifyPlus\Http\Responses\TwoFactorEnabledResponse;
 use FortifyPlus\Http\Responses\TwoFactorLoginResponse;
 use FortifyPlus\Http\Responses\VerifyEmailResponse;
+use Kemetech\Admin\Http\Middleware\AdminAuthMiddleware;
 use PragmaRX\Google2FA\Google2FA;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -67,6 +72,7 @@ class FortifyServiceProvider extends ServiceProvider
     public function register()
     {
         app('router')->aliasMiddleware('fguest', RedirectAuthenticatedAdmin::class);
+        app('router')->aliasMiddleware('fauth', AdminAuthMiddleware::class);
 
         $this->mergeConfigFrom(__DIR__.'/../config/fortifyplus.php', 'fortifyplus');
 
@@ -96,20 +102,16 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->singleton(FailedPasswordResetResponseContract::class, FailedPasswordResetResponse::class);
         $this->app->singleton(FailedTwoFactorLoginResponseContract::class, FailedTwoFactorLoginResponse::class);
         $this->app->singleton(LockoutResponseContract::class, LockoutResponse::class);
-        $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
-        $this->app->singleton(LogoutResponseContract::class, LogoutResponse::class);
         $this->app->singleton(PasswordConfirmedResponseContract::class, PasswordConfirmedResponse::class);
         $this->app->singleton(PasswordResetResponseContract::class, PasswordResetResponse::class);
         $this->app->singleton(PasswordUpdateResponseContract::class, PasswordUpdateResponse::class);
         $this->app->singleton(ProfileInformationUpdatedResponseContract::class, ProfileInformationUpdatedResponse::class);
         $this->app->singleton(RecoveryCodesGeneratedResponseContract::class, RecoveryCodesGeneratedResponse::class);
-        $this->app->singleton(RegisterResponseContract::class, RegisterResponse::class);
         $this->app->singleton(EmailVerificationNotificationSentResponseContract::class, EmailVerificationNotificationSentResponse::class);
         $this->app->singleton(SuccessfulPasswordResetLinkRequestResponseContract::class, SuccessfulPasswordResetLinkRequestResponse::class);
         $this->app->singleton(TwoFactorConfirmedResponseContract::class, TwoFactorConfirmedResponse::class);
         $this->app->singleton(TwoFactorDisabledResponseContract::class, TwoFactorDisabledResponse::class);
         $this->app->singleton(TwoFactorEnabledResponseContract::class, TwoFactorEnabledResponse::class);
-        $this->app->singleton(TwoFactorLoginResponseContract::class, TwoFactorLoginResponse::class);
         $this->app->singleton(VerifyEmailResponseContract::class, VerifyEmailResponse::class);
 
         $this->app->when([RegisterAdminController::class, AdminSessionAuthentication::class, AdminConfirmablePasswordController::class, AdminTwoFactorAuthenticatedSessionController::class])
@@ -123,17 +125,35 @@ class FortifyServiceProvider extends ServiceProvider
             ->give(function () {
                 return new LoginResponse('admin');
             });
+
+        $this->app->when(AuthenticatedSessionController::class)
+            ->needs(LoginResponseContract::class)
+            ->give(function () {
+                return new LoginResponse('user');
+            });
         
         $this->app->when(AdminSessionAuthentication::class)
             ->needs(LogoutResponseContract::class)
             ->give(function () {
                 return new LogoutResponse('admin');
             });
+
+        $this->app->when(AuthenticatedSessionController::class)
+            ->needs(LogoutResponseContract::class)
+            ->give(function () {
+                return new LogoutResponse('user');
+            });
         
         $this->app->when(RegisterAdminController::class)
             ->needs(RegisterResponseContract::class)
             ->give(function () {
                 return new RegisterResponse('admin');
+            });
+
+        $this->app->when(RegisteredUserController::class)
+            ->needs(RegisterResponseContract::class)
+            ->give(function () {
+                return new RegisterResponse('user');
             });
         
         $this->app->when(AdminVerifyEmailController::class)
@@ -142,10 +162,23 @@ class FortifyServiceProvider extends ServiceProvider
                 return new VerifyEmailResponse('admin');
             });
 
+        $this->app->when(VerifyEmailController::class)
+            ->needs(VerifyEmailViewResponse::class)
+            ->give(function () {
+                return new VerifyEmailResponse('user');
+            });
+
+
         $this->app->when(AdminTwoFactorAuthenticatedSessionController::class)
             ->needs(TwoFactorLoginResponseContract::class)
             ->give(function () {
                 return new TwoFactorLoginResponse('admin');
+            });
+
+        $this->app->when(TwoFactorAuthenticatedSessionController::class)
+            ->needs(TwoFactorLoginResponseContract::class)
+            ->give(function () {
+                return new TwoFactorLoginResponse('user');
             });
     }
 

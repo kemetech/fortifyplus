@@ -2,33 +2,28 @@
 
 namespace FortifyPlus;
 
+use FortifyPlus\Contracts\Admin\CreatesNewAdmins;
+use FortifyPlus\Contracts\Admin\UpdatesAdminPasswords;
+use FortifyPlus\Contracts\Admin\UpdatesAdminProfileInformation;
 use FortifyPlus\Contracts\ConfirmPasswordViewResponse;
 use FortifyPlus\Contracts\CreatesNewUsers;
 use FortifyPlus\Contracts\LoginViewResponse;
 use FortifyPlus\Contracts\RegisterViewResponse;
 use FortifyPlus\Contracts\RequestPasswordResetLinkViewResponse;
 use FortifyPlus\Contracts\ResetPasswordViewResponse;
-use FortifyPlus\Contracts\ResetsUserPasswords;
+use FortifyPlus\Contracts\ResetsAdminPasswords;
 use FortifyPlus\Contracts\TwoFactorChallengeViewResponse;
-use FortifyPlus\Contracts\UpdatesUserPasswords;
-use FortifyPlus\Contracts\UpdatesUserProfileInformation;
 use FortifyPlus\Contracts\VerifyEmailViewResponse;
 use FortifyPlus\Http\Controllers\Admin\AdminNewPasswordController;
-use FortifyPlus\Http\Controllers\Admin\AdminPasswordController;
 use FortifyPlus\Http\Controllers\Admin\AdminPasswordResetLinkController;
 use FortifyPlus\Http\Controllers\Admin\AdminSessionAuthentication;
 use FortifyPlus\Http\Controllers\Admin\AdminTwoFactorAuthenticatedSessionController;
-use FortifyPlus\Http\Controllers\Admin\ProfileInformationController;
 use FortifyPlus\Http\Controllers\Admin\RegisterAdminController;
 use FortifyPlus\Http\Controllers\AuthenticatedSessionController;
 use FortifyPlus\Http\Controllers\NewPasswordController;
-use FortifyPlus\Http\Controllers\PasswordController;
 use FortifyPlus\Http\Controllers\PasswordResetLinkController;
-use FortifyPlus\Http\Controllers\ProfileInformationController as ControllersProfileInformationController;
 use FortifyPlus\Http\Controllers\RegisteredUserController;
 use FortifyPlus\Http\Responses\SimpleViewResponse;
-use Illuminate\Support\Facades\App;
-use PhpParser\Node\Expr\Instanceof_;
 
 class Fortify
 {
@@ -321,21 +316,26 @@ class Fortify
         static::$confirmPasswordsUsingCallback = $callback;
     }
 
-    /**
+        /**
      * Register a class / callback that should be used to create new users.
      *
      * @param  string  $callback
      * @return void
      */
-    public static function createUsersUsing(string $callback, string $adminCallback)
+    public static function createUsersUsing(string $callback)
     {
-        app()->when(RegisterAdminController::class)
-            ->needs(CreatesNewUsers::class)
-            ->give($adminCallback);
-        app()->when(RegisteredUserController::class)
-            ->needs(CreatesNewUsers::class)
-            ->give($callback);
-            
+        app()->singleton(CreatesNewUsers::class, $callback);
+    }
+
+       /**
+     * Register a class / callback that should be used to create new users.
+     *
+     * @param  string  $callback
+     * @return void
+     */
+    public static function createAdminUsing(string $callback)
+    {
+        app()->singleton(CreatesNewAdmins::class, $callback);
     }
 
     /**
@@ -344,14 +344,9 @@ class Fortify
      * @param  string  $callback
      * @return void
      */
-    public static function updateUserProfileInformationUsing(string $callback, string $adminCallback)
+    public static function updateAdminProfileInformationUsing(string $callback)
     {
-        app()->when(ProfileInformationController::class)
-            ->needs(UpdatesUserProfileInformation::class)
-            ->give($adminCallback);
-        app()->when(ControllersProfileInformationController::class)
-            ->needs(UpdatesUserProfileInformation::class)
-            ->give($callback);
+        app()->singleton(UpdatesAdminProfileInformation::class, $callback);
     }
 
     /**
@@ -360,14 +355,9 @@ class Fortify
      * @param  string  $callback
      * @return void
      */
-    public static function updateUserPasswordsUsing(string $callback, string $adminCallback)
+    public static function updateAdminPasswordsUsing(string $callback)
     {
-        app()->when(AdminPasswordController::class)
-            ->needs(UpdatesUserPasswords::class)
-            ->give($adminCallback);
-        app()->when(PasswordController::class)
-            ->needs(UpdatesUserPasswords::class)
-            ->give($callback);
+        app()->singleton(UpdatesAdminPasswords::class, $callback);
     }
 
     /**
@@ -376,15 +366,46 @@ class Fortify
      * @param  string  $callback
      * @return void
      */
-    public static function resetUserPasswordsUsing(string $callback, string $adminCallback)
+    public static function resetAdminPasswordsUsing(string $callback)
     {
-        app()->when(AdminNewPasswordController::class)
-            ->needs(ResetsUserPasswords::class)
-            ->give($adminCallback);
-        app()->when(NewPasswordController::class)
-            ->needs(ResetsUserPasswords::class)
-            ->give($callback);
+        app()->singleton(ResetsAdminPasswords::class, $callback);
     }
+
+
+    /**
+     * Register a class / callback that should be used to update user profile information.
+     *
+     * @param  string  $callback
+     * @return void
+     */
+    public static function updateUserProfileInformationUsing(string $callback)
+    {
+        app()->singleton(UpdatesUserProfileInformation::class, $callback);
+    }
+
+    /**
+     * Register a class / callback that should be used to update user passwords.
+     *
+     * @param  string  $callback
+     * @return void
+     */
+    public static function updateUserPasswordsUsing(string $callback)
+    {
+        app()->singleton(UpdatesUserPasswords::class, $callback);
+    }
+
+    /**
+     * Register a class / callback that should be used to reset user passwords.
+     *
+     * @param  string  $callback
+     * @return void
+     */
+    public static function resetUserPasswordsUsing(string $callback)
+    {
+        app()->singleton(ResetsUserPasswords::class, $callback);
+    }
+
+
 
     /**
      * Determine if Fortify is confirming two factor authentication configurations.
