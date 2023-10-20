@@ -34,8 +34,6 @@ use FortifyPlus\Http\Controllers\Admin\RegisterAdminController;
 use FortifyPlus\Http\Controllers\Admin\AdminSessionAuthentication;
 use FortifyPlus\Http\Controllers\Admin\AdminTwoFactorAuthenticatedSessionController;
 use FortifyPlus\Http\Controllers\Admin\AdminVerifyEmailController;
-use FortifyPlus\Http\Controllers\AuthenticatedSessionController;
-use FortifyPlus\Http\Controllers\RegisteredUserController;
 use FortifyPlus\Http\Middleware\RedirectAuthenticatedAdmin;
 use FortifyPlus\Http\Responses\EmailVerificationNotificationSentResponse;
 use FortifyPlus\Http\Responses\FailedPasswordConfirmationResponse;
@@ -187,7 +185,7 @@ class FortifyServiceProvider extends ServiceProvider
                 __DIR__.'/../stubs/ResetAdminPassword.php' => app_path('Actions/Fortify/ResetAdminPassword.php'),
                 __DIR__.'/../stubs/CreateNewAdmin.php' => app_path('Actions/Fortify/CreateNewAdmin.php'),
 
-                __DIR__.'/../stubs/Admin.php' => app_path('App/Models/Admin.php'),
+                __DIR__.'/../stubs/Admin.php' => app_path('Models/Admin.php'),
 
             ], 'fortify-support');
 
